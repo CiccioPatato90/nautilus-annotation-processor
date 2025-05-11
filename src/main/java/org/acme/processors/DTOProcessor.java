@@ -60,7 +60,6 @@ public class DTOProcessor extends AbstractProcessor {
                     writer.write("package " + dtoPackageName + ";\n\n");
                     writer.write("import " + originalPackage + "." + entityName + ";\n");
                     writer.write("import lombok.Getter;\nimport lombok.Setter;\n");
-                    writer.write("import org.bson.types.ObjectId;\n");
                     writer.write("import java.util.stream.Collectors;\n");
                     writer.write("import java.util.Set;\nimport java.util.HashSet;\nimport java.util.List;\n\n");
 
@@ -113,9 +112,6 @@ public class DTOProcessor extends AbstractProcessor {
 
     private String resolveFieldType(VariableElement field) {
         String originalType = field.asType().toString();
-        if (originalType.equals("org.bson.types.ObjectId")) {
-            return "String";
-        }
         if (field.asType() instanceof DeclaredType) {
             DeclaredType dt = (DeclaredType) field.asType();
             List<? extends TypeMirror> typeArgs = dt.getTypeArguments();
@@ -144,9 +140,6 @@ public class DTOProcessor extends AbstractProcessor {
     private String generateFromEntityConversion(Element field, String fieldName) {
         String expr = "entity.get" + capitalize(fieldName) + "()";
         String type = field.asType().toString();
-        if (type.equals("org.bson.types.ObjectId")) {
-            return "(" + expr + " == null ? null : " + expr + ".toHexString())";
-        }
 
         if (field.asType() instanceof DeclaredType) {
             DeclaredType dt = (DeclaredType) field.asType();
@@ -178,9 +171,6 @@ public class DTOProcessor extends AbstractProcessor {
     private String generateToEntityConversion(Element field, String fieldName) {
         String expr = "dto.get" + capitalize(fieldName) + "()";
         String type = field.asType().toString();
-        if (type.equals("org.bson.types.ObjectId")) {
-            return "(" + expr + " == null ? null : new ObjectId(" + expr + "))";
-        }
 
         if (field.asType() instanceof DeclaredType) {
             DeclaredType dt = (DeclaredType) field.asType();
