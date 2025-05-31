@@ -63,6 +63,14 @@ public class DTOProcessor extends AbstractProcessor {
                     writer.write("import java.util.stream.Collectors;\n");
                     writer.write("import java.util.Set;\nimport java.util.HashSet;\nimport java.util.List;\n\n");
 
+                    if(dtoName.equals("AssociationSkillDTO")){
+                        //add openapi import
+                        writer.write("""
+                                import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+                                import org.eclipse.microprofile.openapi.annotations.media.Schema;
+                                """);
+                    }
+
                     writer.write("@Getter\n@Setter\n");
                     writer.write("public class " + dtoName + extendsClause + " {\n\n");
 
@@ -71,6 +79,12 @@ public class DTOProcessor extends AbstractProcessor {
                             VariableElement field = (VariableElement) enclosed;
                             String fieldName = field.getSimpleName().toString();
                             String fieldType = resolveFieldType(field);
+
+                            if(dtoName.equals("AssociationSkillDTO") && fieldName.equals("area")){
+                                //add openapi schema for area field
+                                writer.write("@Schema(description = \"Area\", type = SchemaType.OBJECT, implementation = Object.class)\n");
+                            }
+
                             writer.write("    private " + fieldType + " " + fieldName + ";\n");
                         }
                     }
